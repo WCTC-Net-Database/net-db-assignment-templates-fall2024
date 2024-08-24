@@ -11,7 +11,7 @@ AssignmentTemplates/
 ├── W3-assignment-template/
 ├── ...
 └── README.md           # Overview of all assignments (this file)
-
+```
 ## How to Use These Templates
 
 1. **Explore the Assignment Folders**:
