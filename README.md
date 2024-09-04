@@ -6,16 +6,16 @@ Welcome to the **Assignment Templates** repository for the NET Database Programm
 
 ```plaintext
 AssignmentTemplates/
-├── Assignment1/
-├── Assignment2/
-├── Assignment3/
+├── W1-assignment-template/
+├── W2-assignment-template/
+├── W3-assignment-template/
 ├── ...
 └── README.md           # Overview of all assignments (this file)
-
+```
 ## How to Use These Templates
 
 1. **Explore the Assignment Folders**:
-   - Each assignment has its own folder, named according to the assignment number and topic (e.g., `Assignment1`).
+   - Each assignment has its own folder, named according to the assignment number and topic (e.g., `W1-assignment-template`).
 
 2. **Read the README in Each Assignment Folder**:
    - Every assignment folder contains a `README.md` file with specific instructions, objectives, and grading criteria for that assignment.
