@@ -2,24 +2,24 @@
 
 namespace W6_assignment_template.Models
 {
-    public class Ghost : IEntity, IFlyable
+    public class Ghost : CharacterBase, IFlyable
     {
-        public string Name { get; set; }
+        public string Treasure { get; set; }
 
-        public void Attack(IEntity target)
+        public Ghost(string name, string type, int level, int hp, string treasure)
+            : base(name, type, level, hp)
         {
-            Console.WriteLine($"{Name} attacks {target.Name} with a chilling touch.");
+            Treasure = treasure;
         }
 
-        public void Move()
-        {
-            Console.WriteLine($"{Name} floats silently.");
-        }
-
-        public Action? FlyAction { get; set; }
         public void Fly()
         {
             Console.WriteLine($"{Name} flies rapidly through the air.");
+        }
+
+        public override void UniqueBehavior()
+        {
+            throw new NotImplementedException();
         }
     }
 }

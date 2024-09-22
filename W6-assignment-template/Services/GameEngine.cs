@@ -1,36 +1,47 @@
-﻿using W6_assignment_template.Interfaces;
+﻿using W6_assignment_template.Data;
 using W6_assignment_template.Models;
 
 namespace W6_assignment_template.Services
 {
     public class GameEngine
     {
-        private readonly IEntity _character;
-        private readonly IEntity _goblin;
-        private readonly IEntity _ghost;
+        private readonly IContext _context;
+        private readonly Player _player;
+        private readonly Goblin _goblin;
 
-        public GameEngine(IEntity character, IEntity goblin, IEntity ghost)
+        public GameEngine(IContext context)
         {
-            _character = character;
-            _goblin = goblin;
-            _ghost = ghost;
+            _context = context;
+            _player = context.Characters.OfType<Player>().FirstOrDefault();
+            _goblin = _context.Characters.OfType<Goblin>().FirstOrDefault();
         }
 
         public void Run()
         {
-            _character.Name = "Hero";
-            _goblin.Name = "Goblin";
-            _ghost.Name = "Ghost";
+            if (_player == null || _goblin == null)
+            {
+                Console.WriteLine("Failed to initialize game characters.");
+                return;
+            }
 
-            _character.Move();
-            _character.Attack(_goblin);
+            Console.WriteLine($"Player Gold: {_player.Gold}");
 
             _goblin.Move();
-            _goblin.Attack(_character);
+            _goblin.Attack(_player);
 
-            _ghost.Move();
-            _ghost.Attack(_character);
-            ((Ghost) _ghost).Fly();
+            _player.Move();
+            _player.Attack(_goblin);
+
+            Console.WriteLine($"Player Gold: {_player.Gold}");
+
+            // Example CRUD operations for Goblin
+            //var newGoblin = new Goblin("New Goblin", "Goblin", 1, 30, "None");
+            //_context.AddCharacter(newGoblin);
+
+            //newGoblin.Level = 2;
+            //_context.UpdateCharacter(newGoblin);
+
+            //_context.DeleteCharacter("New Goblin");
         }
     }
 }

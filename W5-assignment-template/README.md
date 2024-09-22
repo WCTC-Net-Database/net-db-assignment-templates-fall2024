@@ -88,7 +88,7 @@ The goal of this assignment is to refactor the existing `ConsoleRPG` program to 
 | - Updated `GameEngine` to use the new `IFlyable` interface. | 10     |
 | **Implementing New Behaviors**            |        |
 | - Created at least two new classes with unique behaviors. | 20     |
-| - Designed and implemented small, focused interfaces for each new behavior. | 15     |
+| - Designed and implemented small, focused interfaces for each new behavior. | 10     |
 | - Integrated new behaviors into `GameEngine` without violating LSP. | 10     |
 | **Integration and Testing**               |        |
 | - Successfully integrated new behaviors into the game logic. | 10     |
@@ -96,7 +96,7 @@ The goal of this assignment is to refactor the existing `ConsoleRPG` program to 
 | **Code Quality and Documentation**        |        |
 | - Code is clean, well-documented, and follows best practices. | 10     |
 | **Stretch Goal: Implement Command Pattern** |        |
-| - Successfully implemented a simplified Command Pattern for one or more behaviors. | +5    |
+| - Successfully implemented a simplified Command Pattern for one or more behaviors. | +10    |
 
 Here are some resource links to help students better understand the concepts covered in the assignment:
 

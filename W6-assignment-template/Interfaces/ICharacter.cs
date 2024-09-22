@@ -1,8 +1,8 @@
 ﻿namespace W6_assignment_template.Interfaces
 {
-    public interface IEntity
+    public interface ICharacter
     {
-        void Attack(IEntity target);
+        void Attack(ICharacter target);
         void Move();
         string Name { get; set; }
     }

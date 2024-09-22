@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using W6_assignment_template.Interfaces;
-using W6_assignment_template.Models;
+using W6_assignment_template.Data;
 using W6_assignment_template.Services;
 
 namespace W6_assignment_template
@@ -20,18 +19,8 @@ namespace W6_assignment_template
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            services.AddKeyedTransient<IEntity, Character>("character");
-            services.AddKeyedTransient<IEntity, Goblin>("goblin");
-            services.AddKeyedTransient<IEntity, Ghost>("ghost");
-
-            services.AddTransient<GameEngine>(provider =>
-            {
-                var character = provider.GetKeyedService<IEntity>("character");
-                var goblin = provider.GetKeyedService<IEntity>("goblin");
-                var ghost = provider.GetKeyedService<IEntity>("ghost");
-
-                return new GameEngine(character, goblin, ghost);
-            });
+            services.AddSingleton<IContext, DataContext>();
+            services.AddTransient<GameEngine>();
         }
     }
 }

@@ -1,20 +1,23 @@
-﻿using W6_assignment_template.Interfaces;
-
-namespace W6_assignment_template.Models
+﻿namespace W6_assignment_template.Models
 {
-    public class Goblin : IEntity
+    public class Goblin : CharacterBase, ILootable
     {
-        public string Name { get; set; }
+        public string Treasure { get; set; }
 
-        public void Attack(IEntity target)
+        public Goblin(string name, string type, int level, int hp, string treasure)
+            : base(name, type, level, hp)
         {
-            Console.WriteLine($"{Name} attacks {target.Name} with a terrifying shout.");
+            Treasure = treasure;
         }
 
-        public void Move()
+        public override void UniqueBehavior()
         {
-            Console.WriteLine($"{Name} moves aggressively.");
+            throw new NotImplementedException();
         }
     }
 
+    public interface ILootable
+    {
+        string Treasure { get; set; }
+    }
 }
