@@ -17,5 +17,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Models\Characters\Ghost.cs~RF427fae60.TMP" />
+    <None Remove="Models\Characters\Player.cs~RF426d4945.TMP" />
+  </ItemGroup>
   
 </Project>

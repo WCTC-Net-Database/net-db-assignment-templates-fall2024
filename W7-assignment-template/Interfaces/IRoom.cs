@@ -10,5 +10,6 @@ public interface IRoom
     IRoom? West { get; set; }
     IRoom? East { get; set; }
 
+    List<ICharacter> Characters { get; set; }
     void Enter();
 }

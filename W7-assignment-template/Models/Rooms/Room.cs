@@ -1,4 +1,5 @@
 using W7_assignment_template.Interfaces;
+using W7_assignment_template.Services;
 
 namespace W7_assignment_template.Models.Rooms;
 
@@ -10,16 +11,25 @@ public class Room : IRoom
     public IRoom? West { get; set; }
     public IRoom? East { get; set; }
     public string Description { get; }
+    public List<ICharacter> Characters { get; set; }
 
-    public Room(string name, string description)
+    private readonly OutputManager _outputManager;
+
+    public Room(string name, string description, OutputManager outputManager)
     {
         Name = name;
         Description = description;
+        _outputManager = outputManager;
+        Characters = new List<ICharacter>();
     }
  
     public void Enter()
     {
-        Console.WriteLine($"You have entered {Name}. {Description}");
+        _outputManager.WriteLine($"You have entered {Name}. {Description}", ConsoleColor.Green);
+        foreach (var character in Characters)
+        {
+            _outputManager.WriteLine($"{character.Name} is here.", ConsoleColor.Red);
+        }
     }
 
 }

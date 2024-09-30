@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using W7_assignment_template.Data;
 using W7_assignment_template.Interfaces;
 using W7_assignment_template.Models.Characters;
 using W7_assignment_template.Models.Rooms;
@@ -14,23 +15,25 @@ internal class Program
         services.AddTransient<GameEngine>();
         services.AddTransient<MenuManager>();
         services.AddTransient<MapManager>();
+        services.AddSingleton<OutputManager>();
 
         // Register Room and RoomFactory
         services.AddTransient<IRoom, Room>();
         services.AddTransient<IRoomFactory, RoomFactory>();
 
-        // Register CharacterFactory
-        services.AddTransient<ICharacterFactory, CharacterFactory>();
+        // Register IContext
+        services.AddSingleton<IContext, DataContext>();
 
         // Register GameEngine with dependency injection for characters and RoomFactory
         services.AddTransient<GameEngine>(provider =>
         {
-            var characterFactory = provider.GetService<ICharacterFactory>();
             var roomFactory = provider.GetService<IRoomFactory>();
             var menuManager = provider.GetService<MenuManager>();
             var mapManager = provider.GetService<MapManager>();
+            var outputManager = provider.GetService<OutputManager>();
+            var context = provider.GetService<IContext>();
 
-            return new GameEngine(characterFactory, roomFactory, menuManager, mapManager);
+            return new GameEngine(context, roomFactory, menuManager, mapManager, outputManager);
         });
     }
 

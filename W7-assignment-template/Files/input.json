@@ -1,37 +1,51 @@
 ﻿[
   {
-    "Name": "John, Brave",
-    "Class": "Fighter",
-    "Level": "1",
-    "HP": "10",
-    "Equipment": "sword|shield|potion"
+    "$type": "W7_assignment_template.Models.Characters.Player",
+    "Name": "Brave Sir Robin",
+    "Type": "Fighter",
+    "Level": 1,
+    "HP": 10,
+    "Equipment": "sword|shield|potion",
+    "Gold": 50
   },
   {
-    "Name": "Jane",
-    "Class": "Wizard",
-    "Level": "2",
-    "HP": "6",
-    "Equipment": "staff|robe|book"
+    "$type": "W7_assignment_template.Models.Characters.Goblin",
+    "Name": "Bob Goblin",
+    "Type": "Goblin",
+    "Level": 1,
+    "HP": 5,
+    "Treasure": "club"
   },
   {
-    "Name": "Bob, Sneaky",
-    "Class": "Rogue",
-    "Level": "3",
-    "HP": "8",
-    "Equipment": "dagger|lockpick|cloak"
+    "$type": "W7_assignment_template.Models.Characters.Goblin",
+    "Name": "Tom Goblin",
+    "Type": "Goblin",
+    "Level": 1,
+    "HP": 5,
+    "Treasure": null
   },
   {
-    "Name": "Alice",
-    "Class": "Cleric",
-    "Level": "4",
-    "HP": "12",
-    "Equipment": "mace|armor|potion"
+    "$type": "W7_assignment_template.Models.Characters.Goblin",
+    "Name": "Boss Goblin",
+    "Type": "Goblin",
+    "Level": 1,
+    "HP": 10,
+    "Treasure": "leather armor"
   },
   {
-    "Name": "Reginald III, Sir",
-    "Class": "Knight",
-    "Level": "5",
-    "HP": "20",
-    "Equipment": "sword|armor|horse"
+    "$type": "W7_assignment_template.Models.Characters.Ghost",
+    "Name": "Silent Ghost",
+    "Type": "Ghost",
+    "Level": 2,
+    "HP": 8,
+    "Treasure": "cloak"
+  },
+  {
+    "$type": "W7_assignment_template.Models.Characters.Ghost",
+    "Name": "Scary Ghost",
+    "Type": "Ghost",
+    "Level": 2,
+    "HP": 8,
+    "Treasure": null
   }
 ]
