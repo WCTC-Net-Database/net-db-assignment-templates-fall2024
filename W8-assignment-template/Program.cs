@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using W8_assignment_template.Data;
 using W8_assignment_template.Interfaces;
 using W8_assignment_template.Models.Characters;
 using W8_assignment_template.Models.Rooms;
@@ -14,26 +15,12 @@ internal class Program
         services.AddTransient<GameEngine>();
         services.AddTransient<MenuManager>();
         services.AddTransient<MapManager>();
-        services.AddTransient<OutputManager>();
+        services.AddSingleton<OutputManager>();
 
-        // Register Room and RoomFactory
         services.AddTransient<IRoom, Room>();
         services.AddTransient<IRoomFactory, RoomFactory>();
-
-        // Register CharacterFactory
-        services.AddTransient<ICharacterFactory, CharacterFactory>();
-
-        // Register GameEngine with dependency injection for characters and RoomFactory
-        services.AddTransient<GameEngine>(provider =>
-        {
-            var characterFactory = provider.GetService<ICharacterFactory>();
-            var roomFactory = provider.GetService<IRoomFactory>();
-            var menuManager = provider.GetService<MenuManager>();
-            var mapManager = provider.GetService<MapManager>();
-            var outputManager = provider.GetService<OutputManager>();
-
-            return new GameEngine(characterFactory, roomFactory, menuManager, mapManager, outputManager);
-        });
+        services.AddSingleton<IContext, DataContext>();
+        
     }
 
     private static void Main(string[] args)
@@ -42,8 +29,8 @@ internal class Program
         ConfigureServices(serviceCollection);
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
-        var gameEngine = serviceProvider.GetService<GameEngine>();
 
+        var gameEngine = serviceProvider.GetService<GameEngine>();
         gameEngine?.Run();
     }
 }
