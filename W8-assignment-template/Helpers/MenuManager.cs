@@ -1,4 +1,4 @@
-﻿namespace W8_assignment_template.Services;
+﻿namespace W8_assignment_template.Helpers;
 
 public class MenuManager
 {
