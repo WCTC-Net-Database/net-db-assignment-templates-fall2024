@@ -1,7 +1,7 @@
-﻿### Assignment: Entity Framework Core Introduction with Console RPG
+﻿### Assignment: Implement Table-per-hierarchy (TPH) and discriminator in Entity Framework
 
 **Objective:**  
-In this assignment, you will be introduced to Entity Framework (EF) Core and use it to manage your `Room` and `Character` entities within the Console RPG project. You will learn how to set up the Entity Framework context, work with connection strings, generate migrations, and update the database. Additionally, you will be required to implement functionality to add and find characters using the `GameEngine` and `Menu` classes.
+In this assignment, you will be introduced to Entity Framework (EF) Core and use it to manage your `Room` and `Character` entities within the Console RPG project. You will learn how to set up the Entity Framework context, work with connection strings, generate migrations, and update the database. Additionally, you will be required to implement functionality to add and find characters using the `GameEngine` and `Menu` classes. You will also extend the project to include a new `Ability` entity and ensure that both `Player` and `Goblin` classes can have multiple abilities.
 
 ---
 
@@ -12,14 +12,19 @@ In this assignment, you will be introduced to Entity Framework (EF) Core and use
 Ensure your project references EF Core by installing the necessary packages. Use the following commands in the **Package Manager Console** or the **.NET CLI**:
 
 ```bash
-dotnet add package Microsoft.EntityFrameworkCore
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer
-dotnet add package Microsoft.EntityFrameworkCore.Tools
+dotnet add package Microsoft.EntityFrameworkCore.Proxies --version 6.0.35
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 6.0.35
+dotnet add package Microsoft.EntityFrameworkCore.Tools --version 6.0.35
+dotnet add package Microsoft.Extensions.Configuration.EnvironmentVariables --version 6.0.1
+dotnet add package Microsoft.Extensions.Configuration.Json --version 6.0.0
+dotnet add package Microsoft.Extensions.Logging.Console --version 6.0.0
+dotnet add package NReco.Logging.File --version 1.2.1
+
 ```
 
 #### Step 2: Update `GameContext.cs`
 
-Modify the `GameContext` class to include the correct EF Core connection string and define the `DbSet` properties for your `Room` and `Character` entities.
+Modify the `GameContext` class to include the correct EF Core connection string and define the `DbSet` properties for your `Room`, `Character`, and `Ability` entities.
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
@@ -28,12 +33,25 @@ public class GameContext : DbContext
 {
     public DbSet<Room> Rooms { get; set; }
     public DbSet<Character> Characters { get; set; }
+    public DbSet<Ability> Abilities { get; set; }
 
-    // Override OnConfiguring to set up the connection string for the SQL Server
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public GameContext(DbContextOptions<GameContext> options) : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Replace with your actual connection string from https://www.connectionstrings.com/sql-server/
-        optionsBuilder.UseSqlServer("YourConnectionStringHere");
+        // Configure TPH for Character hierarchy
+        modelBuilder.Entity<Character>()
+            .HasDiscriminator<string>("Discriminator")
+            .HasValue<Player>("Player")
+            .HasValue<Goblin>("Goblin");
+
+        // Configure many-to-many relationship between Character and Ability
+        modelBuilder.Entity<Character>()
+            .HasMany(c => c.Abilities)
+            .WithMany(a => a.Characters)
+            .UsingEntity(j => j.ToTable("CharacterAbilities"));
+
+        base.OnModelCreating(modelBuilder);
     }
 }
 ```
@@ -89,7 +107,7 @@ After generating the migration, apply the changes to the database by running:
 dotnet ef database update
 ```
 
-This will create the `Rooms` and `Characters` tables in your SQL Server database.
+This will create the `Rooms`, `Characters`, and `Abilities` tables in your SQL Server database.
 
 #### Step 5: Verify the Template Is Running
 
@@ -99,94 +117,100 @@ Before proceeding to the next steps, verify that your base assignment template i
 
 ### **Modification Requirements:**
 
-#### 1. Add a Room
+#### 1. Add Abilities
 
-Update your application to support adding a new room to the game. This functionality will reside in the `Menu` and `GameEngine` classes.
+Extend the project to include a new `Ability` entity and ensure that both `Player` and `Goblin` classes can have multiple abilities.
 
-In the `Menu` class, add a menu option to **Add a Room**:
-
+**Ability.cs:**
 ```csharp
-Console.WriteLine("Add a Room");
-```
-
-In the `GameEngine`, create the logic to prompt the user for the room’s details and add it to the context:
-
-```csharp
-public void AddRoom()
+public abstract class Character : ICharacter
 {
-    Console.Write("Enter room name: ");
-    var name = Console.ReadLine();
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int Level { get; set; }
 
-    Console.Write("Enter room description: ");
-    var description = Console.ReadLine();
+    // Foreign key to Room
+    public int RoomId { get; set; }
 
-    var room = new Room
+    // Navigation property to Room
+    public virtual Room Room { get; set; }
+
+    // Navigation property to Abilities
+    public virtual ICollection<Ability> Abilities { get; set; }
+
+    public virtual void Attack(ICharacter target)
     {
-        Name = name,
-        Description = description
-    };
+        Console.WriteLine($"{Name} attacks {target.Name}!");
+    }
+}
 
-    _context.Rooms.Add(room);
-    _context.SaveChanges();
+public abstract class Ability
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    
+    // Foreign key to Character
+    public int CharacterId { get; set; }
 
-    Console.WriteLine($"Room '{name}' added to the game.");
+    // Navigation property to Characters
+    public virtual ICollection<Character> Characters { get; set; }
 }
 ```
 
-This will allow you to add rooms dynamically to the game and store them in the database.
-
-#### 2. Add a Character
-
-Update your application to support adding a new character to a room. This functionality will reside in the `Menu` and `GameEngine` classes.
-
-In the `Menu` class, add a menu option to **Add a Character**:
-
+**PlayerAbility.cs:**
 ```csharp
-Console.WriteLine("Add a Character");
-```
-
-In the `GameEngine`, create the logic to prompt the user for the character’s details and add it to a room:
-
-```csharp
-public void AddCharacter()
+public class PlayerAbility : Ability
 {
-    Console.Write("Enter character name: ");
-    var name = Console.ReadLine();
-
-    Console.Write("Enter character level: ");
-    var level = int.Parse(Console.ReadLine());
-
-    Console.Write("Enter room ID for the character: ");
-    var roomId = int.Parse(Console.ReadLine());
-
-    // TODO Add character to the room
-    // Find the room by ID
-    // If the room doesn't exist, return
-    // Otherwise, create a new character and add it to the room
-    // Save the changes to the database
+    public int Shove { get; set; }
 }
 ```
 
-#### 3. Find a Character
-
-Add another option to **Find a Character** in the `Menu` class:
-
+**GoblinAbility.cs:**
 ```csharp
-Console.WriteLine("Find a Character");
+public class GoblinAbility : Ability
+{
+    public int Taunt { get; set; }
+}
 ```
 
-In the `GameEngine`, implement logic to search for a character by name:
-
+**Update `GameContext.cs` to include the new `Ability` entity:**
 ```csharp
-public void FindCharacter()
-{
-    Console.Write("Enter character name to search: ");
-    var name = Console.ReadLine();
+public DbSet<Ability> Abilities { get; set; }
+```
 
-    // TODO Find the character by name
-    // Use LINQ to query the database for the character
-    // If the character exists, display the character's information
-    // Otherwise, display a message indicating the character was not found
+**Generate and Apply Migrations:**
+1. Generate the first migration to add the `Ability` entity:
+   ```bash
+   dotnet ef migrations add AddAbilitiesTable
+   ```
+
+2. Apply the migration:
+   ```bash
+   dotnet ef database update
+   ```
+
+3. Generate the second migration to populate some abilities:
+   ```bash
+   dotnet ef migrations add SeedAbilities
+   ```
+
+4. Apply the migration:
+   ```bash
+   dotnet ef database update
+   ```
+
+---
+
+### **Stretch Goal (Optional, +10%):**
+
+Implement functionality to **Execute an Ability** in the `Character` class. This should allow characters to use their abilities during gameplay.  Provide a simple call to this method during the attack sequence.
+
+**Character.cs:**
+```csharp
+public virtual void ExecuteAbility(Ability ability)
+{
+    Console.WriteLine($"{Name} uses {ability.Name}!");
 }
 ```
 
@@ -210,10 +234,10 @@ public void FindCharacter()
   - Clear, concise code and appropriate use of comments.
   - Well-structured, clean code adhering to best practices, including using Entity Framework Core effectively.
 
-### **Stretch Goal (Optional, +10%):**
-
-Implement functionality to **Update a Character’s Level** by adding another option in the `Menu`. This should allow the user to increase or decrease the level of a specific character by searching for them in the database and then updating the corresponding value.
-
 ---
 
-This assignment will help you build foundational skills with Entity Framework Core and ensure that you understand basic operations like adding, finding, and updating records in a database. Good luck!
+
+
+### References
+
+[Entity Framework Core Inheritance](https://learn.microsoft.com/en-us/ef/core/modeling/inheritance)
