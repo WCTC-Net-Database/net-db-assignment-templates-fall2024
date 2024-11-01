@@ -45,6 +45,8 @@ public class GameContext : DbContext
             .HasValue<Player>("Player")
             .HasValue<Goblin>("Goblin");
 
+        // TODO Configure TPH for Abilities hierarchy
+
         // Configure many-to-many relationship between Character and Ability
         modelBuilder.Entity<Character>()
             .HasMany(c => c.Abilities)
