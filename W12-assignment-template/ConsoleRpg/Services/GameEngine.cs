@@ -72,7 +72,7 @@ public class GameEngine
 
     private void SetupGame()
     {
-        _player = _context.Players.OfType<Player>().FirstOrDefault();
+        _player = _context.Players.FirstOrDefault();
         _outputManager.WriteLine($"{_player.Name} has entered the game.", ConsoleColor.Green);
 
         // Load monsters into random rooms 

@@ -1,7 +1,7 @@
 ﻿using ConsoleRpgEntities.Models.Abilities.PlayerAbilities;
 using ConsoleRpgEntities.Models.Attributes;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using ConsoleRpgEntities.Models.Equipments;
 
 namespace ConsoleRpgEntities.Models.Characters
 {
@@ -16,6 +16,7 @@ namespace ConsoleRpgEntities.Models.Characters
         public int? EquipmentId { get; set; }
 
         // Navigation properties
+        public virtual Inventory Inventory { get; set; }
         public virtual Equipment Equipment { get; set; }
         public virtual ICollection<Ability> Abilities { get; set; }
 
@@ -39,31 +40,5 @@ namespace ConsoleRpgEntities.Models.Characters
                 Console.WriteLine($"{Name} does not have the ability {ability.Name}!");
             }
         }
-    }
-
-    public class Equipment
-    {
-        public int Id { get; set; }
-
-        // SQL Server enforces cascading delete rules strictly
-        // so Entity Framework will assume DeleteBehavior.Cascade for relationships
-        public int? WeaponId { get; set; }  // Nullable to avoid cascade issues
-        public int? ArmorId { get; set; }   // Nullable to avoid cascade issues
-
-        // Navigation properties
-        [ForeignKey("WeaponId")]
-        public virtual Item Weapon { get; set; }
-
-        [ForeignKey("ArmorId")]
-        public virtual Item Armor { get; set; }
-    }
-
-    public class Item
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public int Attack { get; set; }
-        public int Defense { get; set; }
     }
 }

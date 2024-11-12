@@ -1,6 +1,7 @@
 ﻿using ConsoleRpgEntities.Models.Abilities.PlayerAbilities;
 using ConsoleRpgEntities.Models.Characters;
 using ConsoleRpgEntities.Models.Characters.Monsters;
+using ConsoleRpgEntities.Models.Equipments;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleRpgEntities.Data
