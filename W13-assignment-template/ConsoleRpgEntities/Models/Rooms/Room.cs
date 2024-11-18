@@ -1,59 +1,33 @@
-﻿using ConsoleRpgEntities.Models.Characters;
-using ConsoleRpgEntities.Models.Npcs;
-using ConsoleRpgEntities.Models.Rooms.RoomFeatures;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using ConsoleRpgEntities.Models.Characters;
 
 namespace ConsoleRpgEntities.Models.Rooms
 {
-    public abstract class Room : IRoom
+    public class Room
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string RoomType { get; set; }  // Discriminator for TPH
 
-        public List<RoomFeature> Features { get; set; } 
-
-        public virtual IEnumerable<Player> Players { get; set; } 
-
-        public virtual IEnumerable<Character> Characters { get; set; } 
-
-        public virtual IEnumerable<Npc> Npcs { get; set; } = new List<Npc>();
-
-        // Navigation for connecting rooms
-        [ForeignKey("NorthRoomId")]
+        [ForeignKey("NorthId")]
         public virtual Room? North { get; set; }
-        public int? NorthRoomId { get; set; }
+        public int? NorthId { get; set; }
 
-        [ForeignKey("SouthRoomId")]
+        [ForeignKey("SouthId")]
         public virtual Room? South { get; set; }
-        public int? SouthRoomId { get; set; }
+        public int? SouthId { get; set; }
 
-        [ForeignKey("EastRoomId")]
+        [ForeignKey("EastId")]
         public virtual Room? East { get; set; }
-        public int? EastRoomId { get; set; }
+        public int? EastId { get; set; }
 
-        [ForeignKey("WestRoomId")]
+        [ForeignKey("WestId")]
         public virtual Room? West { get; set; }
-        public int? WestRoomId { get; set; }
+        public int? WestId { get; set; }
 
-        public Room(int id, string name, string description, string roomType)
-        {
-            Id = id;
-            Name = name;
-            Description = description;
-            RoomType = roomType;
-            Features = new List<RoomFeature>();
-        }
 
-        public void AddFeature(RoomFeature feature)
-        {
-            Features.Add(feature);
-        }
+        public virtual int? PlayerId { get; set; }
+        public virtual ICollection<Player> Players { get; set; }
 
-        public virtual void UseFeature(RoomFeature feature)
-        {
-            feature.ExecuteFeature(this);
-        }
     }
 }

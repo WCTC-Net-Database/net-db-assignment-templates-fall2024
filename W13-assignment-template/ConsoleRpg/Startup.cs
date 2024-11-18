@@ -1,9 +1,8 @@
-﻿using Castle.Core.Configuration;
-using ConsoleRpg.Helpers;
+﻿using ConsoleRpg.Helpers;
 using ConsoleRpg.Services;
 using ConsoleRpgEntities.Data;
 using ConsoleRpgEntities.Helpers;
-using Microsoft.EntityFrameworkCore;
+using ConsoleRpgEntities.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -44,10 +43,13 @@ public static class Startup
             ConfigurationHelper.ConfigureDbContextOptions(options, connectionString);
         });
 
-
         // Register your services
         services.AddTransient<GameEngine>();
         services.AddTransient<MenuManager>();
+        services.AddTransient<MapManager>();
         services.AddSingleton<OutputManager>();
+        services.AddSingleton<PlayerService>();
+        services.AddSingleton<AbilityService>();
+        services.AddSingleton<IOutputService, OutputService>();
     }
 }

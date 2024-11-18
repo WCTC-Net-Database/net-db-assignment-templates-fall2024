@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="NReco.Logging.File" Version="1.2.1" />
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Helpers\MapManager.cs" />
+    <Compile Remove="Helpers\MapManager - Copy.cs" />
   </ItemGroup>
 
   <ItemGroup>

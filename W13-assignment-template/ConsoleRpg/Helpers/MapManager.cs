@@ -1,77 +1,105 @@
-using ConsoleRpg.Interfaces;
+﻿using ConsoleRpgEntities.Data;
+using ConsoleRpgEntities.Models.Rooms;
+using Microsoft.EntityFrameworkCore;
+using Spectre.Console;
+using System.Text;
 
 namespace ConsoleRpg.Helpers;
 
 public class MapManager
 {
     private const int RoomNameLength = 5;
-    private const int gridRows = 5;
-    private const int gridCols = 5;
+    private const int GridRows = 5;
+    private const int GridCols = 5;
+    private readonly string[,] _mapGrid;
+    private readonly GameContext _context;
     private readonly OutputManager _outputManager;
-    private readonly string[,] mapGrid;
-    private IRoom _currentRoom;
+    private Room _currentRoom;
 
-    public MapManager(OutputManager outputManager)
+    public MapManager(GameContext context, OutputManager outputManager)
     {
-        _currentRoom = null;
+        _context = context;
         _outputManager = outputManager;
-        mapGrid = new string[gridRows, gridCols];
+        _currentRoom = null;
+        _mapGrid = new string[GridRows, GridCols];
+    }
+
+    public void LoadInitialRoom(int roomId)
+    {
+        // Fetch the initial room based on its ID
+        _currentRoom = _context.Set<Room>().Include(r => r.North)
+                                             .Include(r => r.South)
+                                             .Include(r => r.East)
+                                             .Include(r => r.West)
+                                             .FirstOrDefault(r => r.Id == roomId);
     }
 
     public void DisplayMap()
     {
-        _outputManager.WriteLine("Map:");
+        var mapBuilder = new StringBuilder();
+        mapBuilder.AppendLine("Map:");
 
-        for (var i = 0; i < gridRows; i++)
+        // Clear map grid
+        for (var i = 0; i < GridRows; i++)
         {
-            for (var j = 0; j < gridCols; j++)
+            for (var j = 0; j < GridCols; j++)
             {
-                mapGrid[i, j] = "       ";
+                _mapGrid[i, j] = "       ";
             }
         }
 
+        // Place the current room and its neighbors
         if (_currentRoom != null)
         {
-            var startRow = gridRows / 2;
-            var startCol = gridCols / 2;
+            var startRow = GridRows / 2;
+            var startCol = GridCols / 2;
             PlaceRoom(_currentRoom, startRow, startCol);
         }
 
-        for (var i = 0; i < gridRows; i++)
+        // Build the map grid row by row
+        for (var i = 0; i < GridRows; i++)
         {
-            for (var j = 0; j < gridCols; j++)
+            for (var j = 0; j < GridCols; j++)
             {
-                if (mapGrid[i, j].Contains("[") && mapGrid[i, j].Contains("]"))
+                if (_mapGrid[i, j].Contains("[") && _mapGrid[i, j].Contains("]"))
                 {
-                    if (mapGrid[i, j] == $"[{_currentRoom.Name.Substring(0, RoomNameLength)}]")
+                    var roomName = Markup.Escape(_mapGrid[i, j]);
+                    if (_mapGrid[i, j] == $"[{_currentRoom.Name.Substring(0, RoomNameLength)}]")
                     {
-                        _outputManager.Write($"{mapGrid[i, j],-7}", ConsoleColor.Green);
+                        mapBuilder.Append($"[yellow]{roomName,-7}[/]");
                     }
                     else
                     {
-                        _outputManager.Write($"{mapGrid[i, j],-7}");
+                        mapBuilder.Append($"[white]{roomName,-7}[/]");
                     }
                 }
                 else
                 {
-                    _outputManager.Write($"{mapGrid[i, j],-7}");
+                    mapBuilder.Append($"[dim]{Markup.Escape(_mapGrid[i, j]),-7}[/]");
                 }
             }
 
-            _outputManager.WriteLine("");
+            mapBuilder.AppendLine();
         }
 
-        _outputManager.Display();
+        _outputManager.UpdateMapContent(mapBuilder.ToString());
     }
 
-    public void UpdateCurrentRoom(IRoom currentRoom)
+
+
+    public void UpdateCurrentRoom(int roomId)
     {
-        _currentRoom = currentRoom;
+        // Update current room based on new ID and refresh relationships
+        _currentRoom = _context.Set<Room>().Include(r => r.North)
+                                             .Include(r => r.South)
+                                             .Include(r => r.East)
+                                             .Include(r => r.West)
+                                             .FirstOrDefault(r => r.Id == roomId);
     }
 
-    private void PlaceRoom(IRoom room, int row, int col)
+    private void PlaceRoom(Room room, int row, int col)
     {
-        if (mapGrid[row, col] != "       ")
+        if (_mapGrid[row, col] != "       ")
         {
             return;
         }
@@ -80,36 +108,29 @@ public class MapManager
             ? room.Name.Substring(0, RoomNameLength)
             : room.Name.PadRight(RoomNameLength);
 
-        if (room == _currentRoom)
-        {
-            mapGrid[row, col] = $"[{roomName}]";
-        }
-        else
-        {
-            mapGrid[row, col] = $"[{roomName}]";
-        }
+        _mapGrid[row, col] = $"[{roomName}]";
 
         if (room.North != null && row > 1)
         {
-            mapGrid[row - 1, col] = "   |   ";
+            _mapGrid[row - 1, col] = "   |   ";
             PlaceRoom(room.North, row - 2, col);
         }
 
-        if (room.South != null && row < gridRows - 2)
+        if (room.South != null && row < GridRows - 2)
         {
-            mapGrid[row + 1, col] = "   |   ";
+            _mapGrid[row + 1, col] = "   |   ";
             PlaceRoom(room.South, row + 2, col);
         }
 
-        if (room.East != null && col < gridCols - 2)
+        if (room.East != null && col < GridCols - 2)
         {
-            mapGrid[row, col + 1] = "  ---  ";
+            _mapGrid[row, col + 1] = "  ---  ";
             PlaceRoom(room.East, row, col + 2);
         }
 
         if (room.West != null && col > 1)
         {
-            mapGrid[row, col - 1] = "  ---  ";
+            _mapGrid[row, col - 1] = "  ---  ";
             PlaceRoom(room.West, row, col - 2);
         }
     }

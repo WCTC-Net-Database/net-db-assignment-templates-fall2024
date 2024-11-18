@@ -1,44 +1,118 @@
+﻿using Spectre.Console;
+
 namespace ConsoleRpg.Helpers;
 
 public class OutputManager
 {
-    private readonly List<(string message, ConsoleColor color)> _outputBuffer; // A list of messages with associated colors
+    private readonly string _initialMapContent;
+    private readonly Layout _layout;
+    private readonly Panel _mapPanel;
+    private readonly List<string> _logContent;
+    private const int MaxLogLines = 15; // Maximum number of visible log lines
 
-    public OutputManager()
+    public OutputManager(string initialMapContent = "### Initial Map Area ###")
     {
-        _outputBuffer = new List<(string message, ConsoleColor color)>();
+        _initialMapContent = initialMapContent;
+        _logContent = new List<string>();
+
+        // Create the initial map panel
+        _mapPanel = new Panel(_initialMapContent)
+            .Expand()
+            .Border(BoxBorder.Square)
+            .Padding(1, 1, 1, 1)
+            .Header("Map");
+
+        // Create the layout with two regions
+        _layout = new Layout()
+            .SplitRows(
+                new Layout("Map").Size(10), // Fixed size for the map area
+                new Layout("Logs"));       // Flexible size for the log area
+
+        // Set the initial content for each region
+        _layout["Map"].Update(_mapPanel);
+        _layout["Logs"].Update(CreateLogPanel());
     }
 
-    public void Clear()
+    public void Initialize()
     {
-        Console.Clear();
-        _outputBuffer.Clear();
+        // Render the initial layout
+        //AnsiConsole.Clear();
+        AnsiConsole.Cursor.SetPosition(0, 0);
+        AnsiConsole.Write(_layout);
     }
 
-    public void Display()
+    public void AddLogEntry(string logEntry)
     {
-        foreach (var (message, color) in _outputBuffer)
-        {
-            WriteColorToConsole(message, color); // Write stored messages with color
-        }
+        // Add the log entry
+        _logContent.Add(logEntry);
 
-        _outputBuffer.Clear(); // Clear the buffer after displaying
+        // If the log exceeds the maximum visible lines, scroll
+        var visibleLogs = _logContent.Skip(Math.Max(0, _logContent.Count - MaxLogLines)).ToList();
+
+        // Update the Logs region of the layout
+        _layout["Logs"].Update(CreateLogPanel(visibleLogs));
+
+        // Re-render the layout
+        //AnsiConsole.Clear();
+        AnsiConsole.Cursor.SetPosition(0, 0);
+        AnsiConsole.Write(_layout);
     }
 
-    public void Write(string message, ConsoleColor color = ConsoleColor.White)
+    public string GetUserInput(string prompt)
     {
-        _outputBuffer.Add((message, color));
+        // Add the prompt to the visible logs for display
+        var visibleLogs = _logContent.Skip(Math.Max(0, _logContent.Count - MaxLogLines)).ToList();
+        visibleLogs.Add($"[yellow]{Markup.Escape(prompt)}[/]");
+
+        // Update the Logs region with the prompt
+        _layout["Logs"].Update(CreateLogPanel(visibleLogs));
+
+        // Re-render the layout without clearing the console
+        AnsiConsole.Write(_layout);
+
+        // Move the cursor to the end of the log panel
+        var cursorTop = Console.CursorTop;
+        Console.SetCursorPosition(2, cursorTop); // 2 spaces for padding after the border
+
+        // Display the input prompt and capture user input
+        Console.Write("> ");
+        var userInput = Console.ReadLine()?.Trim() ?? string.Empty;
+
+        // Log the user's input
+        AddLogEntry($"[yellow]User Input:[/] {Markup.Escape(userInput)}");
+
+        return userInput;
     }
 
-    public void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
+
+
+
+    public void UpdateMapContent(string newMapContent)
     {
-        _outputBuffer.Add((message + Environment.NewLine, color));
+        // Update the map panel content
+        var updatedMapPanel = new Panel(newMapContent)
+            .Expand()
+            .Border(BoxBorder.Square)
+            .Padding(1, 1, 1, 1)
+            .Header("Map");
+
+        // Update the Map region of the layout
+        _layout["Map"].Update(updatedMapPanel);
+
+        // Re-render the layout
+        AnsiConsole.Clear();
+        AnsiConsole.Write(_layout);
     }
 
-    private void WriteColorToConsole(string message, ConsoleColor color)
+    private Panel CreateLogPanel(IEnumerable<string> logs = null)
     {
-        Console.ForegroundColor = color; // Set the text color
-        Console.Write(message); // Write the message to the console
-        Console.ResetColor(); // Reset the console color back to default
+        // Create a panel for the logs
+        var logText = string.Join("\n", logs ?? _logContent);
+
+        return new Panel(new Markup(logText))
+            .Expand()
+            .Border(BoxBorder.Square)
+            .Padding(1, 1, 1, 1)
+            .Header($"Logs ({_logContent.Count})");
     }
 }

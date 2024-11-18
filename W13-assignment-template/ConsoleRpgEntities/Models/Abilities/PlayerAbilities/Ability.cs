@@ -1,5 +1,4 @@
-﻿using ConsoleRpgEntities.Models.Attributes;
-using ConsoleRpgEntities.Models.Characters;
+﻿using ConsoleRpgEntities.Models.Characters;
 
 namespace ConsoleRpgEntities.Models.Abilities.PlayerAbilities
 {
@@ -10,13 +9,6 @@ namespace ConsoleRpgEntities.Models.Abilities.PlayerAbilities
         public string Description { get; set; }
         public string AbilityType { get; set; }
 
-        public virtual IEnumerable<Player> Players { get; set; }
-
-        protected Ability()
-        {
-            Players = new List<Player>();
-        }
-
-        public abstract void Activate(IPlayer user, ITargetable target);
+        public virtual ICollection<Player> Players { get; set; }
     }
 }

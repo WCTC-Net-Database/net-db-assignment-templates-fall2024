@@ -8,13 +8,11 @@ public class MenuManager
     {
         _outputManager = outputManager;
     }
-
     public bool ShowMainMenu()
     {
-        _outputManager.WriteLine("Welcome to the RPG Game!", ConsoleColor.Yellow);
-        _outputManager.WriteLine("1. Start Game", ConsoleColor.Cyan);
-        _outputManager.WriteLine("2. Exit", ConsoleColor.Cyan);
-        _outputManager.Display();
+        _outputManager.AddLogEntry("Welcome to the RPG Game!");
+        _outputManager.AddLogEntry("1. Start Game");
+        _outputManager.AddLogEntry("2. Exit");
 
         return HandleMainMenuInput();
     }
@@ -23,21 +21,18 @@ public class MenuManager
     {
         while (true)
         {
-            var input = Console.ReadLine();
+            var input = _outputManager.GetUserInput("Selection:");
             switch (input)
             {
                 case "1":
-                    _outputManager.WriteLine("Starting game...", ConsoleColor.Green);
-                    _outputManager.Display();
+                    _outputManager.AddLogEntry("Starting game...");
                     return true;
                 case "2":
-                    _outputManager.WriteLine("Exiting game...", ConsoleColor.Red);
-                    _outputManager.Display();
+                    _outputManager.AddLogEntry("Exiting game...");
                     Environment.Exit(0);
                     return false;
                 default:
-                    _outputManager.WriteLine("Invalid selection. Please choose 1 or 2.", ConsoleColor.Red);
-                    _outputManager.Display();
+                    _outputManager.AddLogEntry("Invalid selection. Please choose 1 or 2.");
                     break;
             }
         }
