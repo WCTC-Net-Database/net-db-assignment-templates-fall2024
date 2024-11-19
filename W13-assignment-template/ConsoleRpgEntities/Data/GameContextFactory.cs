@@ -9,8 +9,11 @@ namespace ConsoleRpgEntities.Data
     {
         public GameContext CreateDbContext(string[] args)
         {
+            // Explicitly set the base path to the ConsoleRpg project
+            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "ConsoleRpg");
+
             // Build configuration
-            var configuration = ConfigurationHelper.GetConfiguration();
+            var configuration = ConfigurationHelper.GetConfiguration(basePath);
 
             // Get connection string
             var connectionString = configuration.GetConnectionString("DefaultConnection");

@@ -7,10 +7,11 @@ namespace ConsoleRpgEntities.Helpers
     {
         public static IConfigurationRoot GetConfiguration(string basePath = null, string environmentName = null)
         {
-            basePath ??= Directory.GetCurrentDirectory();
+            // Use the directory of the main project (ConsoleRpg) as the base path
+            basePath ??= AppContext.BaseDirectory;
 
             var builder = new ConfigurationBuilder()
-                .SetBasePath(basePath)
+                .SetBasePath(basePath) // Look for appsettings.json in ConsoleRpg/bin/Debug/net6.0
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             // Optionally add environment-specific configuration
@@ -30,4 +31,5 @@ namespace ConsoleRpgEntities.Helpers
                 .UseLazyLoadingProxies();
         }
     }
+
 }

@@ -19,6 +19,6 @@ public class OutputService : IOutputService
 
     public void WriteLine(string message)
     {
-        _outputManager.AddLogEntry(message + "\n");
+        _outputManager.AddLogEntry(message); // could add additional newlines here, for example, "\n"
     }
 }
